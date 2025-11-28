@@ -1,0 +1,123 @@
+import java.util.*;
+
+public class GestorReportes {
+    private String idGestor;
+    private SistemaVenta sistemaVenta;
+    private List<Incidente> incidentesRegistrados;
+    
+    public GestorReportes() {
+        this.incidentesRegistrados = new ArrayList<>();
+    }
+    
+    public Reporte generarReporteVentas(Date fechaInicio, Date fechaFin, String rutaFiltro) {
+        Reporte reporte = new Reporte();
+        reporte.generarReporteVentas(fechaInicio);
+        return reporte;
+    }
+    
+    public Reporte generarReporteRutas(List<Ruta> rutas, Date periodo) {
+        Reporte reporte = new Reporte();
+        reporte.setTipoReporte("Rutas");
+        return reporte;
+    }
+    
+    public Reporte generarReporteUnidades(List<Unidad> unidades, Date periodo) {
+        Reporte reporte = new Reporte();
+        reporte.setTipoReporte("Unidades");
+        return reporte;
+    }
+    
+    public void registrarIncidente(Incidente incidente) {
+        incidentesRegistrados.add(incidente);
+    }
+    
+    public static void main(String[] args) {
+        GestorReportes gestor = new GestorReportes();
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.print("ID Gestor: ");
+        gestor.idGestor = scanner.nextLine();
+        
+        gestor.sistemaVenta = new SistemaVenta();
+        
+        System.out.print("¿Registrar incidente? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            Incidente incidente = new Incidente();
+            gestor.registrarIncidente(incidente);
+            System.out.println("Incidente registrado");
+        }
+        
+        System.out.print("¿Generar reporte de ventas? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            Date fechaInicio = new Date();
+            Date fechaFin = new Date();
+            Reporte reporte = gestor.generarReporteVentas(fechaInicio, fechaFin, "Ruta1");
+            System.out.println("Reporte de ventas generado");
+        }
+        
+        System.out.print("¿Generar reporte de rutas? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            List<Ruta> rutas = new ArrayList<>();
+            Reporte reporte = gestor.generarReporteRutas(rutas, new Date());
+            System.out.println("Reporte de rutas generado");
+        }
+        
+        System.out.print("¿Generar reporte de unidades? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            List<Unidad> unidades = new ArrayList<>();
+            Reporte reporte = gestor.generarReporteUnidades(unidades, new Date());
+            System.out.println("Reporte de unidades generado");
+        }
+        
+        System.out.println("Gestor configurado exitosamente");
+        System.out.println("Incidentes registrados: " + gestor.incidentesRegistrados.size());
+    }
+}
+
+class SistemaVenta {
+    private String idSistema;
+    
+    public String getIdSistema() {
+        return idSistema;
+    }
+}
+
+class Incidente {
+    private String idIncidente;
+    
+    public String getIdIncidente() {
+        return idIncidente;
+    }
+}
+
+class Reporte {
+    private String tipoReporte;
+    
+    public void generarReporteVentas(Date periodo) {
+        this.tipoReporte = "Ventas";
+    }
+    
+    public void setTipoReporte(String tipo) {
+        this.tipoReporte = tipo;
+    }
+    
+    public String getTipoReporte() {
+        return tipoReporte;
+    }
+}
+
+class Ruta {
+    private String idRuta;
+    
+    public String getIdRuta() {
+        return idRuta;
+    }
+}
+
+class Unidad {
+    private String placa;
+    
+    public String getPlaca() {
+        return placa;
+    }
+}
