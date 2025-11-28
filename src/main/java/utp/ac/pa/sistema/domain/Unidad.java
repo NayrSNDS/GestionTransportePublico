@@ -1,4 +1,5 @@
-package utp.ac.pa.sistema.domain;
+import java.util.*;
+import java.text.SimpleDateFormat;
 
 public class Unidad {
     private String placa;
@@ -7,60 +8,68 @@ public class Unidad {
     private String estado;
     private String tipoCombustible;
     private double kilometraje;
-    private String conductorAsignado;
-
-    public Unidad() {
-        this.estado = "DISPONIBLE";
-    }
-
-    // Getters y Setters
-    public String getPlaca() { return placa; }
-    public void setPlaca(String placa) { this.placa = placa; }
-
-    public String getModelo() { return modelo; }
-    public void setModelo(String modelo) { this.modelo = modelo; }
-
-    public int getCapacidadPasajeros() { return capacidadPasajeros; }
-    public void setCapacidadPasajeros(int capacidadPasajeros) { this.capacidadPasajeros = capacidadPasajeros; }
-
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
-
-    public String getTipoCombustible() { return tipoCombustible; }
-    public void setTipoCombustible(String tipoCombustible) { this.tipoCombustible = tipoCombustible; }
-
-    public double getKilometraje() { return kilometraje; }
-    public void setKilometraje(double kilometraje) { this.kilometraje = kilometraje; }
-
-    public String getConductorAsignado() { return conductorAsignado; }
-    public void setConductorAsignado(String conductorAsignado) { this.conductorAsignado = conductorAsignado; }
-
-    // Métodos
+    private Date fechaMantenimiento;
+    
     public boolean verificarDisponibilidad() {
-        return "DISPONIBLE".equals(estado);
+        return "Disponible".equals(estado) || "En servicio".equals(estado);
     }
-
+    
     public void cambiarEstado(String nuevoEstado) {
         this.estado = nuevoEstado;
-        System.out.println("Unidad " + placa + " cambió a estado: " + nuevoEstado);
     }
-
-    public boolean asignarConductor(String conductor) {
-        if (verificarDisponibilidad()) {
-            this.conductorAsignado = conductor;
-            this.estado = "ASIGNADA";
-            return true;
-        }
-        return false;
+    
+    public int obtenerCapacidad() {
+        return capacidadPasajeros;
     }
-
+    
+    public boolean asignarConductor(Conductor conductor) {
+        return conductor != null;
+    }
+    
     public void programarMantenimiento() {
-        this.estado = "MANTENIMIENTO";
-        System.out.println("Unidad " + placa + " programada para mantenimiento.");
+        this.fechaMantenimiento = new Date();
     }
-
+    
     public String verificarEstadoGeneral() {
-        return "Unidad: " + placa + " | Estado: " + estado + " | Conductor: " + 
-               (conductorAsignado != null ? conductorAsignado : "Sin asignar");
+        return "Placa: " + placa + "\nModelo: " + modelo + "\nEstado: " + estado + 
+               "\nCapacidad: " + capacidadPasajeros + "\nKilometraje: " + kilometraje +
+               "\nÚltimo mantenimiento: " + (fechaMantenimiento != null ? 
+               new SimpleDateFormat("dd/MM/yyyy").format(fechaMantenimiento) : "No programado");
+    }
+    
+    public static void main(String[] args) {
+        Unidad unidad = new Unidad();
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.print("Placa: ");
+        unidad.placa = scanner.nextLine();
+        
+        System.out.print("Modelo: ");
+        unidad.modelo = scanner.nextLine();
+        
+        System.out.print("Capacidad de pasajeros: ");
+        unidad.capacidadPasajeros = scanner.nextInt();
+        scanner.nextLine();
+        
+        System.out.print("Estado: ");
+        unidad.estado = scanner.nextLine();
+        
+        System.out.print("Tipo de combustible: ");
+        unidad.tipoCombustible = scanner.nextLine();
+        
+        System.out.print("Kilometraje: ");
+        unidad.kilometraje = scanner.nextDouble();
+        scanner.nextLine();
+        
+        System.out.print("¿Programar mantenimiento? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            unidad.programarMantenimiento();
+        }
+        
+        System.out.println("\nInformación de la unidad:");
+        System.out.println(unidad.verificarEstadoGeneral());
+        System.out.println("Disponible: " + unidad.verificarDisponibilidad());
     }
 }
+
+class Conductor {}
