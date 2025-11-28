@@ -1,61 +1,65 @@
-package utp.ac.pa.sistema.domain;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class Pasajero extends Usuario {
+public class Pasajero {
     private String documentoIdentidad;
     private List<String> historialRutas;
-    private List<String> boletosComprados;
-    private double saldo;
-
+    private List<Boleto> boletosComprados;
+    private Map<String, String> preferencias;
+    
     public Pasajero() {
-        this.tipoUsuario = "PASAJERO";
         this.historialRutas = new ArrayList<>();
         this.boletosComprados = new ArrayList<>();
+        this.preferencias = new HashMap<>();
     }
-
-    // Getters y Setters
-    public String getDocumentoIdentidad() { return documentoIdentidad; }
-    public void setDocumentoIdentidad(String documentoIdentidad) { this.documentoIdentidad = documentoIdentidad; }
-
-    public List<String> getHistorialRutas() { return historialRutas; }
-    public double getSaldo() { return saldo; }
-    public void setSaldo(double saldo) { this.saldo = saldo; }
-
-    // Métodos específicos
-    public String comprarBoleto(String ruta, double precio) {
-        if (saldo >= precio) {
-            saldo -= precio;
-            String boletoId = "BOL-" + System.currentTimeMillis();
-            boletosComprados.add(boletoId);
-            historialRutas.add(ruta);
-            return boletoId;
-        }
-        return null;
+    
+    public Boleto comprarBoleto(Ruta ruta, String asiento, SistemaVenta sistemaVenta) {
+        Boleto boleto = new Boleto();
+        boletosComprados.add(boleto);
+        return boleto;
     }
-
-    public List<String> consultarRutas(String origen, String destino) {
-        System.out.println("Consultando rutas de " + origen + " a " + destino);
+    
+    public boolean validarBoleto(String idBoleto, SistemaVenta sistemaVenta) {
+        return idBoleto != null && !idBoleto.isEmpty();
+    }
+    
+    public List<Ruta> consultarRutas(String origen, String destino) {
         return new ArrayList<>();
     }
-
-    public boolean validarBoleto(String boletoId) {
-        return boletosComprados.contains(boletoId);
+    
+    public boolean cancelarBoleto(Boleto boleto) {
+        return boletosComprados.remove(boleto);
     }
-
-    public void recargarSaldo(double monto) {
-        this.saldo += monto;
-        System.out.println("Saldo recargado: $" + monto + ". Saldo total: $" + saldo);
+    
+    public List<String> verificarHistorial() {
+        return new ArrayList<>(historialRutas);
     }
-
-    @Override
-    public boolean login(String usuario, String contraseña) {
-        return usuario.equals(this.email) && contraseña.length() >= 4;
-    }
-
-    @Override
-    public void logout() {
-        System.out.println("Pasajero " + nombre + " ha cerrado sesión.");
+    
+    public static void main(String[] args) {
+        Pasajero pasajero = new Pasajero();
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.print("Documento de identidad: ");
+        pasajero.documentoIdentidad = scanner.nextLine();
+        
+        System.out.print("¿Agregar ruta al historial? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            System.out.print("Ruta: ");
+            pasajero.historialRutas.add(scanner.nextLine());
+        }
+        
+        System.out.print("¿Agregar preferencia? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            System.out.print("Clave de preferencia: ");
+            String clave = scanner.nextLine();
+            System.out.print("Valor de preferencia: ");
+            String valor = scanner.nextLine();
+            pasajero.preferencias.put(clave, valor);
+        }
+        
+        System.out.println("Pasajero registrado exitosamente");
     }
 }
+
+class Boleto {}
+class Ruta {}
+class SistemaVenta {}
