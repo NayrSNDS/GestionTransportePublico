@@ -1,0 +1,120 @@
+import java.util.*;
+
+public class SistemaVenta {
+    private String idSistema;
+    private Map<String, Integer> inventarioAsientos;
+    private double recaudacionTotal;
+    private List<Boleto> boletosVendidos;
+    
+    public SistemaVenta() {
+        this.inventarioAsientos = new HashMap<>();
+        this.boletosVendidos = new ArrayList<>();
+    }
+    
+    public Boleto venderBoleto(Pasajero pasajero, Ruta ruta, String asiento) {
+        if (verificarDisponibilidadAsiento(ruta.getIdRuta(), asiento)) {
+            Boleto boleto = new Boleto();
+            boletosVendidos.add(boleto);
+            actualizarInventario(ruta.getIdRuta(), asiento);
+            recaudacionTotal += ruta.getPrecioBase();
+            return boleto;
+        }
+        return null;
+    }
+    
+    public boolean validarBoleto(String idBoleto) {
+        for (Boleto boleto : boletosVendidos) {
+            if (boleto.getIdBoleto().equals(idBoleto)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public int obtenerAsientosDisponibles(String idRuta) {
+        return inventarioAsientos.getOrDefault(idRuta, 50);
+    }
+    
+    private boolean verificarDisponibilidadAsiento(String idRuta, String asiento) {
+        int disponibles = obtenerAsientosDisponibles(idRuta);
+        return disponibles > 0;
+    }
+    
+    private void actualizarInventario(String idRuta, String asiento) {
+        int actual = inventarioAsientos.getOrDefault(idRuta, 50);
+        inventarioAsientos.put(idRuta, actual - 1);
+    }
+    
+    public static void main(String[] args) {
+        SistemaVenta sistema = new SistemaVenta();
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.print("ID Sistema: ");
+        sistema.idSistema = scanner.nextLine();
+        
+        System.out.print("¿Vender boleto? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            Pasajero pasajero = new Pasajero();
+            Ruta ruta = new Ruta();
+            
+            System.out.print("ID Ruta: ");
+            String idRuta = scanner.nextLine();
+            
+            System.out.print("Asiento: ");
+            String asiento = scanner.nextLine();
+            
+            Boleto boleto = sistema.venderBoleto(pasajero, ruta, asiento);
+            if (boleto != null) {
+                System.out.println("Boleto vendido exitosamente");
+            } else {
+                System.out.println("No hay asientos disponibles");
+            }
+        }
+        
+        System.out.print("¿Validar boleto? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            System.out.print("ID Boleto a validar: ");
+            String idBoleto = scanner.nextLine();
+            System.out.println("Boleto válido: " + sistema.validarBoleto(idBoleto));
+        }
+        
+        System.out.print("¿Consultar asientos disponibles? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            System.out.print("ID Ruta: ");
+            String idRuta = scanner.nextLine();
+            System.out.println("Asientos disponibles: " + sistema.obtenerAsientosDisponibles(idRuta));
+        }
+        
+        System.out.println("Recaudación total: $" + sistema.recaudacionTotal);
+        System.out.println("Boletos vendidos: " + sistema.boletosVendidos.size());
+    }
+}
+
+class Pasajero {
+    private String documentoIdentidad;
+    
+    public String getDocumentoIdentidad() {
+        return documentoIdentidad;
+    }
+}
+
+class Ruta {
+    private String idRuta;
+    private double precioBase;
+    
+    public String getIdRuta() {
+        return idRuta;
+    }
+    
+    public double getPrecioBase() {
+        return precioBase;
+    }
+}
+
+class Boleto {
+    private String idBoleto;
+    
+    public String getIdBoleto() {
+        return idBoleto;
+    }
+}
