@@ -1,7 +1,4 @@
-package utp.ac.pa.sistema.domain;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Ruta {
     private String idRuta;
@@ -12,58 +9,74 @@ public class Ruta {
     private double distanciaKm;
     private int tiempoEstimadoMin;
     private double precioBase;
-
+    
     public Ruta() {
         this.paradas = new ArrayList<>();
     }
-
-    // Getters y Setters
-    public String getIdRuta() { return idRuta; }
-    public void setIdRuta(String idRuta) { this.idRuta = idRuta; }
-
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-
-    public String getOrigen() { return origen; }
-    public void setOrigen(String origen) { this.origen = origen; }
-
-    public String getDestino() { return destino; }
-    public void setDestino(String destino) { this.destino = destino; }
-
-    public List<String> getParadas() { return paradas; }
-    public double getDistanciaKm() { return distanciaKm; }
-    public void setDistanciaKm(double distanciaKm) { this.distanciaKm = distanciaKm; }
-
-    public int getTiempoEstimadoMin() { return tiempoEstimadoMin; }
-    public void setTiempoEstimadoMin(int tiempoEstimadoMin) { this.tiempoEstimadoMin = tiempoEstimadoMin; }
-
-    public double getPrecioBase() { return precioBase; }
-    public void setPrecioBase(double precioBase) { this.precioBase = precioBase; }
-
-    // Métodos
+    
     public void agregarParada(String parada) {
         paradas.add(parada);
-        System.out.println("Parada agregada: " + parada);
     }
-
-    public boolean eliminarParada(String parada) {
-        return paradas.remove(parada);
-    }
-
+    
     public int calcularTiempoEstimado() {
-        return (int) (distanciaKm * 2) + (paradas.size() * 5);
+        return (int)(distanciaKm * 2) + (paradas.size() * 5);
     }
-
+    
+    public List<String> obtenerParadas() {
+        return new ArrayList<>(paradas);
+    }
+    
     public double calcularPrecio() {
-        return precioBase + (distanciaKm * 0.1);
+        return precioBase + (distanciaKm * 0.1) + (paradas.size() * 0.5);
     }
-
+    
     public boolean verificarParada(String parada) {
         return paradas.contains(parada);
     }
-
+    
     public String obtenerInformacionCompleta() {
-        return "Ruta: " + nombre + " | De: " + origen + " a " + destino + 
-               " | Distancia: " + distanciaKm + "km | Tiempo: " + tiempoEstimadoMin + "min";
+        return "ID: " + idRuta + "\nNombre: " + nombre + "\nOrigen: " + origen + 
+               "\nDestino: " + destino + "\nParadas: " + paradas.size() + 
+               "\nDistancia: " + distanciaKm + " km\nTiempo estimado: " + 
+               tiempoEstimadoMin + " min\nPrecio base: $" + precioBase;
+    }
+    
+    public static void main(String[] args) {
+        Ruta ruta = new Ruta();
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.print("ID Ruta: ");
+        ruta.idRuta = scanner.nextLine();
+        
+        System.out.print("Nombre: ");
+        ruta.nombre = scanner.nextLine();
+        
+        System.out.print("Origen: ");
+        ruta.origen = scanner.nextLine();
+        
+        System.out.print("Destino: ");
+        ruta.destino = scanner.nextLine();
+        
+        System.out.print("Distancia en km: ");
+        ruta.distanciaKm = scanner.nextDouble();
+        
+        System.out.print("Tiempo estimado en minutos: ");
+        ruta.tiempoEstimadoMin = scanner.nextInt();
+        
+        System.out.print("Precio base: ");
+        ruta.precioBase = scanner.nextDouble();
+        scanner.nextLine();
+        
+        System.out.print("¿Agregar parada? (s/n): ");
+        while (scanner.nextLine().equalsIgnoreCase("s")) {
+            System.out.print("Parada: ");
+            ruta.agregarParada(scanner.nextLine());
+            System.out.print("¿Agregar otra parada? (s/n): ");
+        }
+        
+        System.out.println("\nInformación de la ruta:");
+        System.out.println(ruta.obtenerInformacionCompleta());
+        System.out.println("Precio calculado: $" + ruta.calcularPrecio());
+        System.out.println("Tiempo estimado calculado: " + ruta.calcularTiempoEstimado() + " min");
     }
 }
