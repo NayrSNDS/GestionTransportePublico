@@ -1,8 +1,5 @@
-package utp.ac.pa.sistema.domain;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.text.SimpleDateFormat;
 
 public class Reporte {
     private String idReporte;
@@ -10,71 +7,103 @@ public class Reporte {
     private String tipoReporte;
     private Map<String, Object> datos;
     private String periodo;
-    private String administradorGenera;
-
+    private Administrador administradorGenera;
+    private List<String> filtrosAplicados;
+    
     public Reporte() {
-        this.fechaGeneracion = new Date();
         this.datos = new HashMap<>();
+        this.filtrosAplicados = new ArrayList<>();
+        this.fechaGeneracion = new Date();
     }
-
-    // Getters y Setters
-    public String getIdReporte() { return idReporte; }
-    public void setIdReporte(String idReporte) { this.idReporte = idReporte; }
-
-    public Date getFechaGeneracion() { return fechaGeneracion; }
-    public void setFechaGeneracion(Date fechaGeneracion) { this.fechaGeneracion = fechaGeneracion; }
-
-    public String getTipoReporte() { return tipoReporte; }
-    public void setTipoReporte(String tipoReporte) { this.tipoReporte = tipoReporte; }
-
-    public Map<String, Object> getDatos() { return datos; }
-    public void setDatos(Map<String, Object> datos) { this.datos = datos; }
-
-    public String getPeriodo() { return periodo; }
-    public void setPeriodo(String periodo) { this.periodo = periodo; }
-
-    public String getAdministradorGenera() { return administradorGenera; }
-    public void setAdministradorGenera(String administradorGenera) { this.administradorGenera = administradorGenera; }
-
-    // Métodos
-    public void generarReporteVentas(String periodo) {
-        this.tipoReporte = "VENTAS";
-        this.periodo = periodo;
-        datos.put("totalVentas", 15000.0);
-        datos.put("boletosVendidos", 300);
-        datos.put("rutaMasPopular", "Ruta A - Centro");
-        System.out.println("Reporte de ventas generado para: " + periodo);
+    
+    public void generarReporteVentas(Date periodo) {
+        this.tipoReporte = "Ventas";
+        this.datos.put("totalVentas", 15000.0);
+        this.datos.put("cantidadBoletos", 300);
+        this.datos.put("ventaPromedio", 50.0);
     }
-
+    
     public void generarReporteIncidentes() {
-        this.tipoReporte = "INCIDENTES";
-        datos.put("totalIncidentes", 12);
-        datos.put("incidentesResueltos", 8);
-        datos.put("tipoMasFrecuente", "Retraso");
-        System.out.println("Reporte de incidentes generado.");
+        this.tipoReporte = "Incidentes";
+        this.datos.put("totalIncidentes", 15);
+        this.datos.put("incidentesResueltos", 12);
+        this.datos.put("tiempoPromedioResolucion", 45);
     }
-
+    
     public void exportarPDF() {
         System.out.println("Exportando reporte " + idReporte + " a PDF...");
     }
-
-    public void filtrarDatos(String[] filtros) {
-        System.out.println("Aplicando filtros al reporte: " + String.join(", ", filtros));
+    
+    public void filtrarDatos(List<String> filtros) {
+        this.filtrosAplicados = new ArrayList<>(filtros);
     }
-
+    
     public Map<String, Object> calcularMetricas() {
         Map<String, Object> metricas = new HashMap<>();
-        metricas.put("eficiencia", 85.5);
-        metricas.put("satisfaccion", 90.0);
-        metricas.put("puntualidad", 78.2);
+        metricas.put("fechaGeneracion", fechaGeneracion);
+        metricas.put("totalFiltros", filtrosAplicados.size());
+        metricas.put("tipoReporte", tipoReporte);
         return metricas;
     }
-
+    
     public Map<String, Object> compararPeriodos(String periodoAnterior) {
         Map<String, Object> comparacion = new HashMap<>();
-        comparacion.put("crecimientoVentas", 15.2);
-        comparacion.put("reduccionIncidentes", -8.5);
-        comparacion.put("mejoraPuntualidad", 5.7);
+        comparacion.put("periodoActual", periodo);
+        comparacion.put("periodoAnterior", periodoAnterior);
+        comparacion.put("variacion", 10.5);
+        comparacion.put("tendencia", "Positiva");
         return comparacion;
     }
+    
+    public static void main(String[] args) {
+        Reporte reporte = new Reporte();
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.print("ID Reporte: ");
+        reporte.idReporte = scanner.nextLine();
+        
+        System.out.print("Tipo de Reporte (Ventas/Incidentes): ");
+        reporte.tipoReporte = scanner.nextLine();
+        
+        System.out.print("Periodo: ");
+        reporte.periodo = scanner.nextLine();
+        
+        System.out.print("¿Asignar administrador? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            reporte.administradorGenera = new Administrador();
+        }
+        
+        System.out.print("¿Aplicar filtros? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            List<String> filtros = new ArrayList<>();
+            System.out.print("Filtro 1: ");
+            filtros.add(scanner.nextLine());
+            System.out.print("Filtro 2: ");
+            filtros.add(scanner.nextLine());
+            reporte.filtrarDatos(filtros);
+        }
+        
+        if ("Ventas".equalsIgnoreCase(reporte.tipoReporte)) {
+            reporte.generarReporteVentas(new Date());
+        } else if ("Incidentes".equalsIgnoreCase(reporte.tipoReporte)) {
+            reporte.generarReporteIncidentes();
+        }
+        
+        System.out.println("\nReporte generado:");
+        System.out.println("ID: " + reporte.idReporte);
+        System.out.println("Tipo: " + reporte.tipoReporte);
+        System.out.println("Fecha: " + new SimpleDateFormat("dd/MM/yyyy").format(reporte.fechaGeneracion));
+        System.out.println("Datos: " + reporte.datos);
+        System.out.println("Filtros: " + reporte.filtrosAplicados);
+        
+        System.out.print("¿Exportar a PDF? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            reporte.exportarPDF();
+        }
+        
+        System.out.println("\nMétricas:");
+        System.out.println(reporte.calcularMetricas());
+    }
 }
+
+class Administrador {}
