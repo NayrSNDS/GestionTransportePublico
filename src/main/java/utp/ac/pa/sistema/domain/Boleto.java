@@ -1,6 +1,5 @@
-package utp.ac.pa.sistema.domain;
-
-import java.util.Date;
+import java.util.*;
+import java.text.SimpleDateFormat;
 
 public class Boleto {
     private String idBoleto;
@@ -9,68 +8,79 @@ public class Boleto {
     private String asiento;
     private String estado;
     private String rutaAsignada;
-    private String pasajero;
-
-    public Boleto() {
-        this.fechaEmision = new Date();
-        this.estado = "VENDIDO";
-    }
-
-    // Getters y Setters
-    public String getIdBoleto() { return idBoleto; }
-    public void setIdBoleto(String idBoleto) { this.idBoleto = idBoleto; }
-
-    public Date getFechaEmision() { return fechaEmision; }
-    public void setFechaEmision(Date fechaEmision) { this.fechaEmision = fechaEmision; }
-
-    public double getPrecio() { return precio; }
-    public void setPrecio(double precio) { this.precio = precio; }
-
-    public String getAsiento() { return asiento; }
-    public void setAsiento(String asiento) { this.asiento = asiento; }
-
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
-
-    public String getRutaAsignada() { return rutaAsignada; }
-    public void setRutaAsignada(String rutaAsignada) { this.rutaAsignada = rutaAsignada; }
-
-    public String getPasajero() { return pasajero; }
-    public void setPasajero(String pasajero) { this.pasajero = pasajero; }
-
-    // Métodos
+    private Pasajero pasajero;
+    private Date fechaViaje;
+    
     public boolean validar() {
-        if ("VENDIDO".equals(estado)) {
-            this.estado = "USADO";
-            return true;
-        }
-        return false;
+        return "Activo".equals(estado) && fechaViaje.after(new Date());
     }
-
+    
     public void anular() {
-        this.estado = "ANULADO";
-        System.out.println("Boleto " + idBoleto + " ha sido anulado.");
+        this.estado = "Anulado";
     }
-
-    public double calcularPrecio(double precioBase) {
-        this.precio = precioBase;
-        return precio;
-    }
-
+    
     public boolean verificarVigencia() {
-        return !"ANULADO".equals(estado) && !"USADO".equals(estado);
+        return fechaViaje.after(new Date());
     }
-
+    
     public boolean cambiarAsiento(String nuevoAsiento) {
-        if (verificarVigencia()) {
+        if (nuevoAsiento != null && !nuevoAsiento.isEmpty()) {
             this.asiento = nuevoAsiento;
             return true;
         }
         return false;
     }
-
+    
     public String obtenerInformacion() {
-        return "Boleto: " + idBoleto + " | Ruta: " + rutaAsignada + 
-               " | Asiento: " + asiento + " | Estado: " + estado + " | Precio: $" + precio;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        return "ID Boleto: " + idBoleto + "\nFecha Emisión: " + sdf.format(fechaEmision) + 
+               "\nPrecio: $" + precio + "\nAsiento: " + asiento + "\nEstado: " + estado + 
+               "\nRuta: " + rutaAsignada + "\nFecha Viaje: " + sdf.format(fechaViaje);
+    }
+    
+    public static void main(String[] args) {
+        Boleto boleto = new Boleto();
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.print("ID Boleto: ");
+        boleto.idBoleto = scanner.nextLine();
+        
+        boleto.fechaEmision = new Date();
+        
+        System.out.print("Precio: ");
+        boleto.precio = scanner.nextDouble();
+        scanner.nextLine();
+        
+        System.out.print("Asiento: ");
+        boleto.asiento = scanner.nextLine();
+        
+        System.out.print("Estado: ");
+        boleto.estado = scanner.nextLine();
+        
+        System.out.print("Ruta asignada: ");
+        boleto.rutaAsignada = scanner.nextLine();
+        
+        boleto.pasajero = new Pasajero();
+        
+        System.out.print("Fecha viaje (dd/MM/yyyy): ");
+        try {
+            String fechaStr = scanner.nextLine();
+            boleto.fechaViaje = new SimpleDateFormat("dd/MM/yyyy").parse(fechaStr);
+        } catch (Exception e) {
+            boleto.fechaViaje = new Date();
+        }
+        
+        System.out.println("\nInformación del boleto:");
+        System.out.println(boleto.obtenerInformacion());
+        System.out.println("Válido: " + boleto.validar());
+        System.out.println("Vigente: " + boleto.verificarVigencia());
+    }
+}
+
+class Pasajero {
+    private String documentoIdentidad;
+    
+    public String getDocumentoIdentidad() {
+        return documentoIdentidad;
     }
 }
