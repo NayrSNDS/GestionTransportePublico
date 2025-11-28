@@ -1,0 +1,160 @@
+import java.util.*;
+
+public class GestorAsignaciones {
+    private String idGestor;
+    private List<Turno> turnosActivos;
+    private Map<String, List<String>> asignacionesRutas;
+    
+    public GestorAsignaciones() {
+        this.turnosActivos = new ArrayList<>();
+        this.asignacionesRutas = new HashMap<>();
+    }
+    
+    public boolean asignarRutaConductor(Conductor conductor, Ruta ruta, Horario horario) {
+        if (conductor == null || ruta == null || horario == null) return false;
+        
+        String clave = conductor.getDocumentoIdentidad();
+        if (!asignacionesRutas.containsKey(clave)) {
+            asignacionesRutas.put(clave, new ArrayList<>());
+        }
+        
+        asignacionesRutas.get(clave).add(ruta.getIdRuta() + " - " + horario.getHoraSalida());
+        return true;
+    }
+    
+    public Turno crearTurno(Conductor conductor, Unidad unidad, Date fecha, String horaInicio, String horaFin, String tipo) {
+        if (!validarLicenciaConductor(conductor) || !verificarDisponibilidadConductor(conductor, new Horario())) {
+            return null;
+        }
+        
+        Turno turno = new Turno();
+        turno.asignarConductor(conductor);
+        
+        if (verificarSuperposicionTurnos(turno)) {
+            return null;
+        }
+        
+        turnosActivos.add(turno);
+        return turno;
+    }
+    
+    public List<Turno> obtenerTurnosConductor(Conductor conductor) {
+        List<Turno> turnosConductor = new ArrayList<>();
+        for (Turno turno : turnosActivos) {
+            if (turno.getConductorAsignado() != null && 
+                turno.getConductorAsignado().getDocumentoIdentidad().equals(conductor.getDocumentoIdentidad())) {
+                turnosConductor.add(turno);
+            }
+        }
+        return turnosConductor;
+    }
+    
+    private boolean validarLicenciaConductor(Conductor conductor) {
+        return conductor != null && conductor.getDocumentoIdentidad() != null;
+    }
+    
+    private boolean verificarDisponibilidadConductor(Conductor conductor, Horario horario) {
+        return conductor != null && horario != null;
+    }
+    
+    private boolean verificarSuperposicionTurnos(Turno nuevoTurno) {
+        for (Turno turno : turnosActivos) {
+            if (turno.verificarSuperposicion(nuevoTurno)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public static void main(String[] args) {
+        GestorAsignaciones gestor = new GestorAsignaciones();
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.print("ID Gestor: ");
+        gestor.idGestor = scanner.nextLine();
+        
+        System.out.print("¿Asignar ruta a conductor? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            Conductor conductor = new Conductor();
+            Ruta ruta = new Ruta();
+            Horario horario = new Horario();
+            
+            if (gestor.asignarRutaConductor(conductor, ruta, horario)) {
+                System.out.println("Ruta asignada exitosamente");
+            }
+        }
+        
+        System.out.print("¿Crear turno? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            Conductor conductor = new Conductor();
+            Unidad unidad = new Unidad();
+            Date fecha = new Date();
+            
+            Turno turno = gestor.crearTurno(conductor, unidad, fecha, "08:00", "16:00", "Matutino");
+            if (turno != null) {
+                System.out.println("Turno creado exitosamente");
+            } else {
+                System.out.println("No se pudo crear el turno");
+            }
+        }
+        
+        System.out.print("¿Consultar turnos de conductor? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            Conductor conductor = new Conductor();
+            List<Turno> turnos = gestor.obtenerTurnosConductor(conductor);
+            System.out.println("Turnos del conductor: " + turnos.size());
+        }
+        
+        System.out.println("Gestor configurado exitosamente");
+        System.out.println("Turnos activos: " + gestor.turnosActivos.size());
+        System.out.println("Asignaciones de rutas: " + gestor.asignacionesRutas.size());
+    }
+}
+
+class Conductor {
+    private String documentoIdentidad;
+    
+    public String getDocumentoIdentidad() {
+        return documentoIdentidad;
+    }
+}
+
+class Ruta {
+    private String idRuta;
+    
+    public String getIdRuta() {
+        return idRuta;
+    }
+}
+
+class Horario {
+    private String horaSalida;
+    
+    public String getHoraSalida() {
+        return horaSalida;
+    }
+}
+
+class Unidad {
+    private String placa;
+    
+    public String getPlaca() {
+        return placa;
+    }
+}
+
+class Turno {
+    private Conductor conductorAsignado;
+    
+    public void asignarConductor(Conductor conductor) {
+        this.conductorAsignado = conductor;
+    }
+    
+    public Conductor getConductorAsignado() {
+        return conductorAsignado;
+    }
+    
+    public boolean verificarSuperposicion(Turno otroTurno) {
+        return false;
+    }
+}
