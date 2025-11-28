@@ -1,6 +1,5 @@
-package utp.ac.pa.sistema.domain;
-
-import java.util.Date;
+import java.util.*;
+import java.text.SimpleDateFormat;
 
 public class Incidente {
     private String idIncidente;
@@ -8,77 +7,87 @@ public class Incidente {
     private String tipo;
     private Date fechaReporte;
     private String estado;
-    private String conductorReporta;
-    private String unidadInvolucrada;
-    private String rutaAfectada;
-
-    public Incidente() {
-        this.fechaReporte = new Date();
-        this.estado = "REPORTADO";
-    }
-
-    // Getters y Setters
-    public String getIdIncidente() { return idIncidente; }
-    public void setIdIncidente(String idIncidente) { this.idIncidente = idIncidente; }
-
-    public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
-
-    public String getTipo() { return tipo; }
-    public void setTipo(String tipo) { this.tipo = tipo; }
-
-    public Date getFechaReporte() { return fechaReporte; }
-    public void setFechaReporte(Date fechaReporte) { this.fechaReporte = fechaReporte; }
-
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
-
-    public String getConductorReporta() { return conductorReporta; }
-    public void setConductorReporta(String conductorReporta) { this.conductorReporta = conductorReporta; }
-
-    public String getUnidadInvolucrada() { return unidadInvolucrada; }
-    public void setUnidadInvolucrada(String unidadInvolucrada) { this.unidadInvolucrada = unidadInvolucrada; }
-
-    public String getRutaAfectada() { return rutaAfectada; }
-    public void setRutaAfectada(String rutaAfectada) { this.rutaAfectada = rutaAfectada; }
-
-    // Métodos
+    private Conductor conductorReporta;
+    private Unidad unidadInvolucrada;
+    private Ruta rutaAfectada;
+    
     public void reportarIncidente(String descripcion, String tipo) {
         this.descripcion = descripcion;
         this.tipo = tipo;
-        System.out.println("Incidente reportado: " + descripcion);
+        this.fechaReporte = new Date();
+        this.estado = "Reportado";
     }
-
+    
     public void actualizarEstado(String nuevoEstado) {
         this.estado = nuevoEstado;
-        System.out.println("Incidente " + idIncidente + " actualizado a: " + nuevoEstado);
     }
-
+    
     public String generarReporteDetallado() {
-        return "INCIDENTE: " + idIncidente + 
-               "\nTipo: " + tipo + 
-               "\nDescripción: " + descripcion + 
-               "\nConductor: " + conductorReporta + 
-               "\nUnidad: " + unidadInvolucrada + 
-               "\nEstado: " + estado + 
-               "\nFecha: " + fechaReporte;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        return "ID Incidente: " + idIncidente + "\nTipo: " + tipo + "\nDescripción: " + descripcion +
+               "\nFecha Reporte: " + sdf.format(fechaReporte) + "\nEstado: " + estado +
+               "\nConductor: " + (conductorReporta != null ? "Asignado" : "No asignado") +
+               "\nUnidad: " + (unidadInvolucrada != null ? "Involucrada" : "No involucrada") +
+               "\nRuta: " + (rutaAfectada != null ? "Afectada" : "No afectada");
     }
-
+    
     public String asignarPrioridad() {
-        switch(tipo.toUpperCase()) {
-            case "ACCIDENTE": return "ALTA";
-            case "FALLA_MECANICA": return "MEDIA";
-            default: return "BAJA";
-        }
+        if (tipo.equals("Accidente")) return "Alta";
+        if (tipo.equals("Falla mecánica")) return "Media";
+        if (tipo.equals("Retraso")) return "Baja";
+        return "Normal";
     }
-
+    
     public void notificarAdministrador() {
-        System.out.println("Notificando administrador sobre incidente: " + idIncidente);
+        System.out.println("Notificando al administrador sobre el incidente: " + idIncidente);
     }
-
+    
     public long calcularTiempoResolucion() {
+        if (fechaReporte == null) return 0;
         Date ahora = new Date();
         long diff = ahora.getTime() - fechaReporte.getTime();
-        return diff / (60 * 1000); // diferencia en minutos
+        return diff / (60 * 1000);
+    }
+    
+    public static void main(String[] args) {
+        Incidente incidente = new Incidente();
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.print("ID Incidente: ");
+        incidente.idIncidente = scanner.nextLine();
+        
+        System.out.print("Descripción: ");
+        String desc = scanner.nextLine();
+        
+        System.out.print("Tipo: ");
+        String tipo = scanner.nextLine();
+        
+        incidente.reportarIncidente(desc, tipo);
+        
+        System.out.print("¿Asignar conductor? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            incidente.conductorReporta = new Conductor();
+        }
+        
+        System.out.print("¿Asignar unidad involucrada? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            incidente.unidadInvolucrada = new Unidad();
+        }
+        
+        System.out.print("¿Asignar ruta afectada? (s/n): ");
+        if (scanner.nextLine().equalsIgnoreCase("s")) {
+            incidente.rutaAfectada = new Ruta();
+        }
+        
+        System.out.println("\nReporte Detallado:");
+        System.out.println(incidente.generarReporteDetallado());
+        System.out.println("Prioridad: " + incidente.asignarPrioridad());
+        System.out.println("Tiempo desde reporte: " + incidente.calcularTiempoResolucion() + " minutos");
+        
+        incidente.notificarAdministrador();
     }
 }
+
+class Conductor {}
+class Unidad {}
+class Ruta {}
